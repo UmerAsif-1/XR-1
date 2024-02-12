@@ -13,12 +13,15 @@ public class CustomGrab : MonoBehaviour
     public InputActionReference action;
     bool grabbing = false;
 
+    private Vector3 prevPos;
+    private Quaternion prevRot;
+
     private void Start()
     {
         action.action.Enable();
 
         // Find the other hand
-        foreach (CustomGrab c in transform.parent.GetComponentsInChildren<CustomGrab>())
+        foreach(CustomGrab c in transform.parent.GetComponentsInChildren<CustomGrab>())
         {
             if (c != this)
                 otherHand = c;
@@ -38,8 +41,11 @@ public class CustomGrab : MonoBehaviour
             {
                 // Change these to add the delta position and rotation instead
                 // Save the position and rotation at the end of Update function, so you can compare previous pos/rot to current here
-                grabbedObject.position = transform.position;
-                grabbedObject.rotation = transform.rotation;
+                Vector3 deltaPos = transform.position - prevPos;
+                Quaternion deltaRot = Quaternion.Inverse(prevRot) * transform.rotation;
+
+                grabbedObject.position += deltaPos;
+                grabbedObject.rotation = deltaRot * grabbedObject.rotation;
             }
         }
         // If let go of button, release object
@@ -47,6 +53,9 @@ public class CustomGrab : MonoBehaviour
             grabbedObject = null;
 
         // Should save the current position and rotation here
+
+        prevPos = transform.position;
+        prevRot = transform.rotation;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -58,14 +67,14 @@ public class CustomGrab : MonoBehaviour
         // Make sure gravity is disabled though, or your controllers will (virtually) fall to the ground
 
         Transform t = other.transform;
-        if (t && t.tag.ToLower() == "grabbable")
+        if(t && t.tag.ToLower()=="grabbable")
             nearObjects.Add(t);
     }
 
     private void OnTriggerExit(Collider other)
     {
         Transform t = other.transform;
-        if (t && t.tag.ToLower() == "grabbable")
+        if( t && t.tag.ToLower()=="grabbable")
             nearObjects.Remove(t);
     }
 }
