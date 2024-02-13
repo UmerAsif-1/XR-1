@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class VectorScript : MonoBehaviour
 {
-    public Camera lensCamera;
+    public Transform lens;
 
     public Camera mainCamera;
     public Vector3 vector;
@@ -17,9 +17,9 @@ public class VectorScript : MonoBehaviour
     void Update()
     {
 
-        vector = lensCamera.transform.position - mainCamera.transform.position;
-        final_vector = lensCamera.transform.position + vector;
-        lensCamera.transform.LookAt(final_vector);
+        vector = transform.position - mainCamera.transform.position;
+        final_vector = transform.position + vector;
+        transform.LookAt(final_vector,lens.up);
         
     }
 }
